@@ -1,0 +1,9 @@
+{
+  "name": "ScrapeSync",
+  "version": "0.0.1",
+  "description": "Scrapes your data from the web and keeps it in sync.",
+  "main": "index.js",
+  "repository": "https://github.com/vogler/ScrapeSync.git",
+  "author": "Ralf Vogler <ralf.vogler@gmail.com>",
+  "license": "MIT"
+}
