@@ -4,8 +4,8 @@ const cheerio = require('cheerio');
 const URL = 'https://golem.de';
 fetch(URL)
   .then(res => res.text())
-  .then(body => {
-    const $ = cheerio.load(body);
+  .then(html => {
+    const $ = cheerio.load(html);
     // $('h2').each((index, element) => {
     //   const text = element.children[0].data.trim();
     //   if (text.length) console.log(text);
