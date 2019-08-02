@@ -12,7 +12,7 @@ Better to extract relevant structured data and gather it locally.
   Data is siloed, there's no way to list all data from all websites.
   Sometimes have to login and click through a couple of pages to get to the actual data.
   Sometimes the data is spread across several pages, but I want to see it all together.
-  Some data might not be visible in the UI, but only via API or data export (which might take days and be several GBs).
+  Some data might not be visible in the UI, but only via API (for which you usually have to sign up) or data export (which might take days and be several GBs).
   Unreliable search: can't find some ordered items on AliExpress, despite them being in the list.
 - **Consolidation/analysis**
   Same class of data should be stored using the same schema. E.g. orders from different websites.
@@ -29,7 +29,8 @@ With some UI on top this could also be used as a feed reader.
 
 ## How?
 
-- **API** easiest and most reliable way to get structured data.
+- **RSS/Atom** nice, but only for public data.
+- **API** easiest and most reliable way to get structured data, but might require extra setup (account, tokens).
 - **Web scraping** Might require adjustments whenever the structure of the web site changes.
 - **File system** Some data might already be stored locally and just needs to be imported.
 
