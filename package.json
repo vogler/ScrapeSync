@@ -5,5 +5,14 @@
   "main": "index.js",
   "repository": "https://github.com/vogler/ScrapeSync.git",
   "author": "Ralf Vogler <ralf.vogler@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
+    "get-urls": "^9.1.0",
+    "node-fetch": "^2.6.0",
+    "puppeteer": "^1.19.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.1.0"
+  }
 }

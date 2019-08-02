@@ -63,7 +63,7 @@ Save it into some document store like MongoDB.
 
 ### Structure
 
-Use a directory for each website.  It should have a
+Use a directory in `web/` for each website.  It should have a
 
 - `README.md` with
   - screenshots that highlight the exported data,
