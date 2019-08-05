@@ -1,6 +1,8 @@
 import puppeteer from 'puppeteer';
 import prompts from 'prompts';
 
+const submit = (page: puppeteer.Page) => Promise.all([page.click('[type=submit]'), page.waitForNavigation()]);
+
 const main = async () => {
   const auth = await prompts([
     { 'name': 'email', 'type': 'text', 'message': 'E-Mail' },
@@ -15,18 +17,12 @@ const main = async () => {
   await page.type('[name=password]', auth.password);
   await page.click('[name=rememberMe]');
   // await page.screenshot({ path: '1.png' });
-  await Promise.all([
-    page.click('[type=submit]'),
-    page.waitForNavigation(),
-  ]);
+  await submit(page);
 
   // 2FA page
   await page.type('[name=otpCode]', auth.otp);
   await page.click('[name=rememberDevice]');
-  await Promise.all([
-    page.click('[type=submit]'),
-    page.waitForNavigation(),
-  ]);
+  await submit(page);
   await page.waitFor(5000);
 
   console.log(await page.cookies());
