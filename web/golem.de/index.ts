@@ -1,5 +1,5 @@
-const fetch = require('node-fetch');
-const cheerio = require('cheerio');
+import fetch from 'node-fetch';
+import * as cheerio from 'cheerio';
 
 const URL = 'https://golem.de';
 const main = async () => {
