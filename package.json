@@ -1,5 +1,5 @@
 {
-  "name": "ScrapeSync",
+  "name": "scrape-sync",
   "version": "0.0.1",
   "description": "Scrapes your data from the web and keeps it in sync.",
   "main": "index.js",
