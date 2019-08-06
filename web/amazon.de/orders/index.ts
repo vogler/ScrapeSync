@@ -35,6 +35,7 @@ const main = async () => {
   }
   console.log(page.url());
   assert(page.url().startsWith(target));
+  await cred.save();
   await page.waitFor(5000);
   // console.log(await page.cookies());
   // browser.close();
