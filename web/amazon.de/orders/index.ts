@@ -8,7 +8,7 @@ const target = 'https://www.amazon.de/gp/css/order-history';
 
 const main = async () => {
   const cred = await auth(target);
-  const browser = await puppeteer.launch({ userDataDir: "./user_data", headless: false });
+  const browser = await puppeteer.launch({ userDataDir: "./user_data", headless: false, defaultViewport: null });
   const page = await browser.newPage();
   await page.goto(target);
 
