@@ -7,13 +7,13 @@ import { submit } from '../../../util/puppeteer';
 const target = 'https://www.amazon.de/gp/css/order-history';
 
 const main = async () => {
-  const cred = await auth(target);
   const browser = await puppeteer.launch({ userDataDir: "./user_data", headless: false, defaultViewport: null });
   const page = await browser.newPage();
   await page.goto(target);
-
+  
   // login page
   if (page.url().startsWith('https://www.amazon.de/ap/signin')) {
+    const cred = await auth(target);
     await page.type('[name=email]', cred.account);
     await page.type('[name=password]', cred.password);
     await page.click('[name=rememberMe]');
@@ -36,10 +36,9 @@ const main = async () => {
         await submit(page);
       }
     }
+    await cred.save();
   }
-  console.log(page.url());
   assert(page.url().startsWith(target));
-  await cred.save();
   await page.waitFor(5000);
   // browser.close();
 };
