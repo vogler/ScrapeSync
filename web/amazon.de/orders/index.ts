@@ -1,5 +1,5 @@
 import puppeteer from 'puppeteer';
-import { submit } from 'util/puppeteer';
+import { submit } from '../../../util/puppeteer';
 import prompts from 'prompts';
 
 const main = async () => {
