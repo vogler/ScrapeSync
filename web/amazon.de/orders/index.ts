@@ -1,12 +1,14 @@
 import puppeteer from 'puppeteer';
 import { submit } from '../../../util/puppeteer';
 import prompts from 'prompts';
+import validator from 'validator';
 
 const main = async () => {
   const auth = await prompts([
-    { 'name': 'email', 'type': 'text', 'message': 'E-Mail' },
+    { 'name': 'email', 'type': 'text', 'message': 'E-Mail', validate: x => validator.isEmail(x) || 'invalid address' },
     { 'name': 'password', 'type': 'password', 'message': 'Password' },
-    { 'name': 'otp', 'type': 'password', 'message': '2FA/OTP' }]);
+    { 'name': 'otp', 'type': 'password', 'message': '2FA/OTP (enter if not needed)' }]);
+  if (!auth.email || !auth.password) return;
   const browser = await puppeteer.launch({ headless: false });
   const page = await browser.newPage();
   await page.goto('https://www.amazon.de/gp/css/order-history');
@@ -19,10 +21,12 @@ const main = async () => {
   await submit(page);
 
   // 2FA page
-  await page.type('[name=otpCode]', auth.otp);
-  await page.click('[name=rememberDevice]');
-  await submit(page);
-  await page.waitFor(5000);
+  if (auth.otp.length) {
+    await page.type('[name=otpCode]', auth.otp);
+    await page.click('[name=rememberDevice]');
+    await submit(page);
+    await page.waitFor(5000);
+  }
 
   console.log(await page.cookies());
 };

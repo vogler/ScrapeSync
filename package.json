@@ -13,13 +13,15 @@
     "prompts": "^2.2.1",
     "puppeteer": "^1.19.0",
     "ts-node": "^8.3.0",
-    "typescript": "^3.5.3"
+    "typescript": "^3.5.3",
+    "validator": "^11.1.0"
   },
   "devDependencies": {
     "@types/cheerio": "^0.22.12",
     "@types/node-fetch": "^2.5.0",
     "@types/prompts": "^2.0.1",
     "@types/puppeteer": "^1.19.0",
+    "@types/validator": "^10.11.2",
     "eslint": "^6.1.0"
   }
 }
