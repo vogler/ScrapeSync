@@ -8,7 +8,6 @@ const target = 'https://www.amazon.de/gp/css/order-history';
 
 const main = async () => {
   const cred = await auth(target);
-  console.log(cred);
   const browser = await puppeteer.launch({ headless: false });
   const page = await browser.newPage();
   await page.goto(target);
@@ -19,6 +18,11 @@ const main = async () => {
     await page.type('[name=password]', cred.password);
     await page.click('[name=rememberMe]');
     await submit(page);
+    if (page.url().startsWith('https://www.amazon.de/ap/signin')) {
+      console.error('Login failed. Wrong credentials?');
+      if (await cred.delete()) console.log('Deleted saved credentials.');
+      process.exit(1);
+    }
 
     // 2FA page
     while (page.url().startsWith('https://www.amazon.de/ap/mfa')) {
