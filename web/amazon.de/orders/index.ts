@@ -8,7 +8,7 @@ const target = 'https://www.amazon.de/gp/css/order-history';
 
 const main = async () => {
   const cred = await auth(target);
-  const browser = await puppeteer.launch({ headless: false });
+  const browser = await puppeteer.launch({ userDataDir: "./user_data", headless: false });
   const page = await browser.newPage();
   await page.goto(target);
 
@@ -41,7 +41,6 @@ const main = async () => {
   assert(page.url().startsWith(target));
   await cred.save();
   await page.waitFor(5000);
-  // console.log(await page.cookies());
   // browser.close();
 };
 main();
