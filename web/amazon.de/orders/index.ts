@@ -1,38 +1,36 @@
+import assert from 'assert';
+
+import auth from '../../../util/auth'
 import puppeteer from 'puppeteer';
 import { submit } from '../../../util/puppeteer';
-import prompts from 'prompts';
-import validator from 'validator';
-import assert from 'assert';
 
 const target = 'https://www.amazon.de/gp/css/order-history';
 
 const main = async () => {
-  const auth = await prompts([
-    { 'name': 'email', 'type': 'text', 'message': 'E-Mail', validate: x => validator.isEmail(x) || 'invalid address' },
-    { 'name': 'password', 'type': 'password', 'message': 'Password' },
-    { 'name': 'otp', 'type': 'password', 'message': '2FA/OTP (enter if not needed)' }]);
-  if (!auth.email || !auth.password) return;
+  const cred = await auth(target);
+  console.log(cred);
   const browser = await puppeteer.launch({ headless: false });
   const page = await browser.newPage();
   await page.goto(target);
 
+  // login page
   if (page.url().startsWith('https://www.amazon.de/ap/signin')) {
-    // login page
-    await page.type('[name=email]', auth.email);
-    await page.type('[name=password]', auth.password);
+    await page.type('[name=email]', cred.account);
+    await page.type('[name=password]', cred.password);
     await page.click('[name=rememberMe]');
-    // await page.screenshot({ path: '1.png' });
     await submit(page);
-    
+
     // 2FA page
-    if (page.url().startsWith('https://www.amazon.de/ap/mfa')) {
-      if (!auth.otp.length) {
-        console.error('Got redirected to 2FA page, but you did not enter a code.');
-        return;
-      }
-      await page.type('[name=otpCode]', auth.otp);
+    while (page.url().startsWith('https://www.amazon.de/ap/mfa')) {
       await page.click('[name=rememberDevice]');
-      await submit(page);
+      if (!cred.otp) {
+        console.error('Got redirected to 2FA page, but you did not enter a code (or it is wrong). Please enter manually and submit.');
+        await page.waitForNavigation({ timeout: 0 });
+      } else {
+        await page.type('[name=otpCode]', cred.otp);
+        delete cred.otp; // switch to manual if invalid
+        await submit(page);
+      }
     }
   }
   console.log(page.url());
