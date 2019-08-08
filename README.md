@@ -3,27 +3,27 @@ Better to extract relevant structured data and gather it locally.
 
 ## Why?
 
-- **Backup** "Everything not saved will be lost"
-  Many services just shut down. Last instance: "Save your Google+ content before March 31, 2019". More: https://killedbygoogle.com/
-  Don't want to worry about getting all data out before some strange deadline.
-  Limited storage: eBay only keeps data for the last 90 days? How often do you need to check Facebook to not miss posts?
-  Content might be changed or deleted (e.g. URL now shows a different article, comment might be deleted).
-- **Access** zoo of clunky/slow/lacking UIs
-  Data is siloed, there's no way to list all data from all websites.
-  Sometimes have to login and click through a couple of pages to get to the actual data.
-  Sometimes the data is spread across several pages, but I want to see it all together.
-  Some data might not be visible in the UI, but only via API (for which you usually have to sign up) or data export (which might take days and be several GBs).
-  Unreliable search: can't find some ordered items on AliExpress, despite them being in the list.
+- **Backup** "Everything not saved will be lost!"
+  - Many services just shut down. Last instance: "Save your Google+ content before March 31, 2019". More: https://killedbygoogle.com/
+  - Don't want to worry about getting all data out before some strange deadline.
+  - Limited storage: eBay only keeps data for the last 90 days? How often do you need to check Facebook to not miss posts?
+  - Content might be changed or deleted (e.g. URL now shows a different article, comment might be deleted).
+- **Access** Zoo of clunky/slow/lacking UIs.
+  - Data is siloed, there's no way to list all data from all websites.
+  - Sometimes have to login and click through a couple of pages to get to the actual data.
+  - Sometimes the data is spread across several pages, but I want to see it all together.
+  - Some data might not be visible in the UI, but only via API (for which you usually have to sign up) or data export (which might take days and be several GBs).
+  - Unreliable search: can't find some ordered items on AliExpress, despite them being in the list.
 - **Consolidation/analysis**
-  Same class of data should be stored using the same schema. E.g. orders from different websites.
-  Enables analysis and statistics like how much you ordered, commented etc.
+  - Same class of data should be stored using the same schema. E.g. orders from different websites.
+  - Enables analysis and statistics like how much you ordered, commented etc.
 - **Automation/notifications**
-  Don't want to check websites manually for change. Enables automation.
+  - Don't want to check websites manually for change. Enables automation.
 - **Extend/link/track**
-  What if I want to save some note for an order? Could save the note somewhere and link to the order. Better to have it together.
-  Some data is not linkable, or the link is not specific enough.
-  Enables meta data, like when and how often data has been seen.
-  Different types of data might belong to the same group/project and should be tagged as such.
+  - What if I want to save some note for an order? Could save the note somewhere and link to the order. Better to have it together.
+  - Some data is not linkable, or the link is not specific enough.
+  - Enables meta data, like when and how often data has been seen.
+  - Different types of data might belong to the same group/project and should be tagged as such.
 
 With some UI on top this could also be used as a feed reader.
 
@@ -50,7 +50,7 @@ How to detect change?
 Seems to make sense to stick to node/javascript.
 
 - [cheerio](https://github.com/cheeriojs/cheerio): jQuery for node
-  Fast but only works if data is included in the initial server response. Login might be hard.
+  - Fast but only works if data is included in the initial server response. Login might be hard.
 - [Puppeteer](https://github.com/GoogleChrome/puppeteer): Headless Chrome Node API
   - [Nightmare](https://github.com/segmentio/nightmare): same but using Electron?
   - [Daydream](https://github.com/segmentio/daydream): chrome extension to record your actions into a nightmare or puppeteer script
