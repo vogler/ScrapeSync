@@ -39,6 +39,10 @@ const main = async () => {
     }
     await cred.save();
   }
+  if (page.url() != target) {
+    console.warn(`URL is ${page.url()} instead of ${target}`);
+    page.goto(target);
+  }
   assert(page.url().startsWith(target));
   // const val = (e: Element | null) => e && e.innerHTML.trim() || ''; // can't pass functions into eval?
   const orders = await Promise.all((await page.$$('div.order')).map(async div => {
