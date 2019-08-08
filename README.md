@@ -77,6 +77,8 @@ Use a directory in `web/` for each website.  It should have a
 
 ## Usage
 
-After `yarn install` do
+Run `yarn` to install dependencies, and then e.g. `yarn amazon` (`yarn run` lists all scripts). 
+
+Planned:
 - `yarn sync <website1> <website2> <...>` to get data continuously and store it
 - `yarn scrape <website>` to get data once without storing it (for debugging)

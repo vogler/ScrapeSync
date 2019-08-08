@@ -6,6 +6,9 @@
   "repository": "https://github.com/vogler/ScrapeSync.git",
   "author": "Ralf Vogler <ralf.vogler@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "amazon": "ts-node web/amazon.de/orders/index.ts"
+  },
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
     "get-urls": "^9.1.0",
