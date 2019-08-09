@@ -19,7 +19,7 @@ const main = async () => {
     const cred = await auth(target);
     // const frame = (await (await page.$('iframe'))!.contentFrame())!;
     const frame = page.frames()[2];
-    await frame.type('#fm-login-id', cred.account);
+    await frame.$eval('#fm-login-id', (e, a) => (<HTMLInputElement> e).value = a, cred.account);
     await frame.type('#fm-login-password', cred.password);
     await Promise.all([frame.click('[type=submit]'), page.waitForNavigation()]);
     if (page.url().startsWith('https://login.aliexpress.com')) {
