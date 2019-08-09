@@ -41,7 +41,7 @@ const main = async () => {
   }
   if (page.url() != target) {
     console.warn(`URL is ${page.url()} instead of ${target}`);
-    page.goto(target);
+    await page.goto(target);
   }
   assert(page.url().startsWith(target));
   // const val = (e: Element | null) => e && e.innerHTML.trim() || ''; // can't pass functions into eval?
