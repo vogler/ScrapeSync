@@ -34,13 +34,17 @@ const main = async () => {
     await page.goto(target);
   }
   assert(page.url().startsWith(target));
-
+  await page.evaluate(() => {
+    (<any>window).all = (e: Element) => (sel: string) => Array.from(e.querySelectorAll(sel)).map(e => e.innerHTML.trim());
+  });
   const orders = await page.$$eval('tbody', es => es.map(e => {
-    const info = Array.from(e.querySelectorAll('span.info-body')).map(e => e.innerHTML.trim());
+    const all = (<any>window).all(e);
+    const info = all('span.info-body');
     return {
       id: info[0],
       order_time: info[1],
       store_name: info[2],
+      amount: all('p.amount-num')[0],
     }
   }));
   console.dir(orders, { depth: null });
