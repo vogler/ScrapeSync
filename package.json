@@ -7,7 +7,8 @@
   "author": "Ralf Vogler <ralf.vogler@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "amazon": "ts-node web/amazon.de/orders/index.ts"
+    "amazon": "ts-node web/amazon.de/orders/index.ts",
+    "aliexpress": "ts-node web/aliexpress.com/orders/index.ts"
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
