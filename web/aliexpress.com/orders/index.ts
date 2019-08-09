@@ -1,37 +1,37 @@
 import assert from 'assert';
 
-// import auth from '../../../util/auth'
+import auth from '../../../util/auth'
 import puppeteer from 'puppeteer';
-import { submit } from '../../../util/puppeteer';
+// import { submit } from '../../../util/puppeteer';
 import { resolve } from 'path';
+// import fs from 'fs';
 
 const target = 'https://trade.aliexpress.com/orderList.htm';
 
 const main = async () => {
-  const browser = await puppeteer.launch({ userDataDir: resolve('user_data'), headless: true, defaultViewport: null });
+  const browser = await puppeteer.launch({ userDataDir: resolve('user_data'), headless: false, defaultViewport: null });
   const page = await browser.newPage();
   await page.goto(target);
+  // fs.writeFileSync('aliexpress.html', await page.content());
 
   // login page
   if (page.url().startsWith('https://login.aliexpress.com')) {
-    const cred = {account: 'foo', password: 'bar'};
-    // const cred = await auth(target);
-    await page.waitFor(5000);
-    console.log(await page.content());
-    console.log(await page.$$eval('.fm-text', es => es)); // values get serialized by jQuery
-    await page.type('#fm-login-id', cred.account);
-    await page.type('#fm-login-password', cred.password);
-    await submit(page);
+    const cred = await auth(target);
+    // const frame = (await (await page.$('iframe'))!.contentFrame())!;
+    const frame = page.frames()[2];
+    await frame.type('#fm-login-id', cred.account);
+    await frame.type('#fm-login-password', cred.password);
+    await Promise.all([frame.click('[type=submit]'), page.waitForNavigation()]);
     if (page.url().startsWith('https://login.aliexpress.com')) {
       console.error('Login failed. Wrong credentials?');
-      // if (await cred.delete()) console.log('Deleted saved credentials.');
+      if (await cred.delete()) console.log('Deleted saved credentials.');
       process.exit(1);
     }
-    // await cred.save();
+    await cred.save();
   }
   if (page.url() != target) {
     console.warn(`URL is ${page.url()} instead of ${target}`);
-    page.goto(target);
+    await page.goto(target);
   }
   assert(page.url().startsWith(target));
   // const val = (e: Element | null) => e && e.innerHTML.trim() || ''; // can't pass functions into eval?
