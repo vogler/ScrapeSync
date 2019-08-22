@@ -2,7 +2,7 @@ import assert from 'assert';
 
 import auth from '../../../util/auth'
 import puppeteer from 'puppeteer';
-// import { submit } from '../../../util/puppeteer';
+import { inject } from '../../../util/puppeteer';
 import { resolve } from 'path';
 // import fs from 'fs';
 
@@ -34,9 +34,7 @@ const main = async () => {
     await page.goto(target);
   }
   assert(page.url().startsWith(target));
-  await page.evaluate(() => {
-    (<any>window).all = (e: Element) => (sel: string) => Array.from(e.querySelectorAll(sel)).map(e => e.innerHTML.trim());
-  });
+  await inject(page);
   const orders = await page.$$eval('tbody', es => es.map(e => {
     const all = (<any>window).all(e);
     const info = all('span.info-body');
