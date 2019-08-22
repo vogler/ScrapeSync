@@ -9,4 +9,7 @@ export const inject = (page: puppeteer.Page) => page.evaluate(() => {
   (<any>window).allT = allT;
 });
 
-// inject_eval_map?
+export const inj_eval_map = async<T> (page: puppeteer.Page, sel: string, f: (e: Element) => T) => {
+  await inject(page);
+  return await page.$$eval(sel, es => es.map(f));
+};
