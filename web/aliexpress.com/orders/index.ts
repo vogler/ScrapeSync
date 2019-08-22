@@ -42,6 +42,7 @@ const main = async () => {
       id: info[0],
       order_time: info[1],
       store_name: info[2],
+      store_url: (<HTMLAnchorElement>e.querySelector('.store-info a')!).href,
       amount: allT('p.amount-num')[0],
     }
   }));
