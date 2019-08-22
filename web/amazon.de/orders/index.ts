@@ -46,8 +46,7 @@ const main = async () => {
   assert(page.url().startsWith(target));
   await inject(page);
   const orders = await page.$$eval('div.order', es => es.map(e => {
-    const all: (e: Element) => (sel: string) => Array<Element> = (<any>window).all;
-    const allT = (<any>window).allT;
+    const {all, allT} = window.inj;
     const info = allT(e)('span.value');
     const shipments = all(e)('div.shipment').map(e => ({
       status: (e => e && e.innerText.trim())(e.querySelector('span')),

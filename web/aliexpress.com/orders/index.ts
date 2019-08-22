@@ -36,7 +36,7 @@ const main = async () => {
   assert(page.url().startsWith(target));
   await inject(page);
   const orders = await page.$$eval('tbody', es => es.map(e => {
-    const allT = (<any>window).allT(e);
+    const allT = window.inj.allT(e);
     const info = allT('span.info-body');
     return {
       id: info[0],
