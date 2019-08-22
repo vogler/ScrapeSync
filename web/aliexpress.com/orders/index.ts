@@ -36,13 +36,13 @@ const main = async () => {
   assert(page.url().startsWith(target));
   await inject(page);
   const orders = await page.$$eval('tbody', es => es.map(e => {
-    const all = (<any>window).all(e);
-    const info = all('span.info-body');
+    const allT = (<any>window).allT(e);
+    const info = allT('span.info-body');
     return {
       id: info[0],
       order_time: info[1],
       store_name: info[2],
-      amount: all('p.amount-num')[0],
+      amount: allT('p.amount-num')[0],
     }
   }));
   console.dir(orders, { depth: null });

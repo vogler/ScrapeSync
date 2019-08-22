@@ -2,7 +2,7 @@ import assert from 'assert';
 
 import auth from '../../../util/auth'
 import puppeteer from 'puppeteer';
-import { submit } from '../../../util/puppeteer';
+import { submit, inject } from '../../../util/puppeteer';
 import { resolve } from 'path';
 
 const target = 'https://www.amazon.de/gp/your-account/order-history?orderFilter=year-2019';
@@ -44,13 +44,15 @@ const main = async () => {
     await page.goto(target);
   }
   assert(page.url().startsWith(target));
-  // const val = (e: Element | null) => e && e.innerHTML.trim() || ''; // can't pass functions into eval?
-  const orders = await Promise.all((await page.$$('div.order')).map(async div => {
-    const info = await div.$$eval('span.value', es => es.map(e => e.innerHTML.trim()));
-    const shipments = await div.$$eval('div.shipment', es => es.map(e => ({
+  await inject(page);
+  const orders = await page.$$eval('div.order', es => es.map(e => {
+    const all: (e: Element) => (sel: string) => Array<Element> = (<any>window).all;
+    const allT = (<any>window).allT;
+    const info = allT(e)('span.value');
+    const shipments = all(e)('div.shipment').map(e => ({
       status: (e => e && e.innerText.trim())(e.querySelector('span')),
-      items: Array.from(e.querySelectorAll('div.a-fixed-left-grid-inner')).map(e => {
-        const a = Array.from(e.querySelectorAll('a'));
+      items: all(e)('div.a-fixed-left-grid-inner').map(e => {
+        const a = <Array<HTMLAnchorElement>>all(e)('a');
         return {
           name: a[1].innerText,
           url: a[1].href,
@@ -58,7 +60,7 @@ const main = async () => {
           price: e.querySelector('nobr') && e.querySelector('nobr')!.innerHTML || e.querySelector('span.a-color-price')!.innerHTML.trim(),
         };
       })
-    })));
+    }));
     return {
       order_date: info[0],
       sum: info[1],
