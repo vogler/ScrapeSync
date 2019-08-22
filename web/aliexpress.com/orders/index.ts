@@ -29,7 +29,7 @@ const main = async () => {
     }
     await cred.save();
   }
-  if (page.url() != target) {
+  if (!page.url().startsWith(target)) {
     console.warn(`URL is ${page.url()} instead of ${target}! Redirecting...`);
     await page.goto(target);
   }
