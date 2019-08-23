@@ -36,9 +36,22 @@ const main = async () => {
   assert(page.url().startsWith(target));
   await inject(page);
   const orders = await page.$$eval('tbody', es => es.map(e => {
-    const {all, allT} = window.inj;
+    const {all, allT, oneT} = window.inj;
     const info = allT(e)('span.info-body');
     const store_url = all(e)('.store-info a', HTMLAnchorElement)[0].href;
+    const items = all(e)('tr.order-body').map(e => {
+      const a = all(e)('a.baobei-name', HTMLAnchorElement)[0];
+      const [price, quantity] = allT(e)('.product-amount span');
+      return {
+        name: a.innerText,
+        variant: oneT(e)('.product-property span.val'),
+        price,
+        quantity: parseInt(quantity.replace('X', '')),
+        status: oneT(e)('.order-status span'),
+        url: a.href,
+        img: all(e)('img', HTMLImageElement)[0].src,
+      }
+    });
     return {
       id: info[0],
       order_time: info[1],
@@ -48,6 +61,7 @@ const main = async () => {
         url: store_url,
       },
       amount: allT(e)('p.amount-num')[0],
+      items,
     }
   }));
   console.dir(orders, { depth: null });
