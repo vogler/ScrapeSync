@@ -18,6 +18,7 @@
     "prompts": "^2.2.1",
     "puppeteer": "^1.19.0",
     "reflect-metadata": "^0.1.13",
+    "sqlite3": "^4.1.0",
     "ts-node": "^8.3.0",
     "typeorm": "^0.2.18",
     "typescript": "^3.5.3",
