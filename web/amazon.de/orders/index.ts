@@ -46,17 +46,17 @@ const main = async () => {
   assert(page.url().startsWith(target));
   await inject(page);
   const orders = await page.$$eval('div.order', es => es.map(e => {
-    const {all, allT} = window.inj;
+    const {all, allT, oneT} = window.inj;
     const info = allT(e)('span.value');
     const shipments = all(e)('div.shipment').map(e => ({
-      status: (e => e && e.innerText.trim())(e.querySelector('span')),
+      status: oneT(e)('span'),
       items: all(e)('div.a-fixed-left-grid-inner').map(e => {
         const a = all(e)('a', HTMLAnchorElement);
         return {
           name: a[1].innerText,
           url: a[1].href,
           img: e.querySelector('img')!.getAttribute('data-a-hires'),
-          price: e.querySelector('nobr') && e.querySelector('nobr')!.innerHTML || e.querySelector('span.a-color-price')!.innerHTML.trim(),
+          price: oneT(e)('nobr, span.a-color-price'),
         };
       })
     }));
