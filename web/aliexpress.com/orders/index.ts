@@ -36,14 +36,18 @@ const main = async () => {
   assert(page.url().startsWith(target));
   await inject(page);
   const orders = await page.$$eval('tbody', es => es.map(e => {
-    const allT = window.inj.allT(e);
-    const info = allT('span.info-body');
+    const {all, allT} = window.inj;
+    const info = allT(e)('span.info-body');
+    const store_url = all(e)('.store-info a', HTMLAnchorElement)[0].href;
     return {
       id: info[0],
       order_time: info[1],
-      store_name: info[2],
-      store_url: (<HTMLAnchorElement>e.querySelector('.store-info a')!).href,
-      amount: allT('p.amount-num')[0],
+      store: {
+        id: store_url.split('/').pop(),
+        name: info[2],
+        url: store_url,
+      },
+      amount: allT(e)('p.amount-num')[0],
     }
   }));
   console.dir(orders, { depth: null });
