@@ -51,7 +51,7 @@ const main = async () => {
     const shipments = all(e)('div.shipment').map(e => ({
       status: (e => e && e.innerText.trim())(e.querySelector('span')),
       items: all(e)('div.a-fixed-left-grid-inner').map(e => {
-        const a = <Array<HTMLAnchorElement>>all(e)('a');
+        const a = all(e)('a', HTMLAnchorElement);
         return {
           name: a[1].innerText,
           url: a[1].href,

@@ -5,13 +5,13 @@ export const submit = (page: puppeteer.Page) => Promise.all([page.click('[type=s
 declare global {
   interface Window {
     inj: {
-      all: (e: Element) => (sel: string) => Element[],
+      all: (e: Element) => <T extends Element = HTMLElement>(sel: string, interface?: new() => T) => Array<T>,
       allT: (e: Element) => (sel: string) => string[],
     }
   }
 }
 export const inject = (page: puppeteer.Page) => page.evaluate(() => {
-  const all = (e: Element) => (sel: string) => Array.from(e.querySelectorAll(sel));
+  const all = (e: Element) => <T extends Element = HTMLElement>(sel: string) => <Array<T>>Array.from(e.querySelectorAll(sel));
   const allT = (e: Element) => (sel: string) => all(e)(sel).map(e => e.innerHTML.trim());
   window.inj = {all, allT};
 });
