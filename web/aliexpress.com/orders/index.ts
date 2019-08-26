@@ -3,19 +3,21 @@ import assert from 'assert';
 import auth from '../../../util/auth'
 import puppeteer from 'puppeteer';
 import { inject } from '../../../util/puppeteer';
-import { resolve } from 'path';
+import { resolve, relative } from 'path';
 import fs from 'fs';
 
 import { createConnection } from 'typeorm';
 import { Order, Store } from './entities';
 
+const name = relative(resolve('web'), __dirname).replace('/', '-');
 var target = 'https://trade.aliexpress.com/orderList.htm';
 
 const main = async () => {
-  const browser = await puppeteer.launch({ userDataDir: resolve('user_data'), headless: true, defaultViewport: null });
+  const browser = await puppeteer.launch({ userDataDir: resolve('data/browser'), headless: true, defaultViewport: null });
   const page = await browser.newPage();
   const offline = process.argv.length >= 3 && process.argv[2] == 'offline';
-  const offline_file = resolve('aliexpress.html');
+  const offline_file = resolve('data/', name + '.html');
+  console.log(__dirname, offline_file);
   if (offline && fs.existsSync(offline_file)) {
     target = 'file://' + offline_file; // page.goto works, with page.setContent(fs.readFileSync(offline_file).toString()) all href were empty
     console.log('offline: load page content from', offline_file);
@@ -80,7 +82,7 @@ const main = async () => {
 
   // sync with database
   const db = await createConnection({
-    type: 'sqlite', database: 'aliexpress.sqlite', // required for sqlite
+    type: 'sqlite', database: 'data/' + name + '.sqlite', // required for sqlite
     entities: [Order, Store], synchronize: true, // boilerplate: register entities, synchronize creates tables if not there
     logging: false,
   });

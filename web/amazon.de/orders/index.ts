@@ -8,7 +8,7 @@ import { resolve } from 'path';
 const target = 'https://www.amazon.de/gp/your-account/order-history?orderFilter=year-2019';
 
 const main = async () => {
-  const browser = await puppeteer.launch({ userDataDir: resolve('user_data'), headless: true, defaultViewport: null });
+  const browser = await puppeteer.launch({ userDataDir: resolve('data/browser'), headless: true, defaultViewport: null });
   const page = await browser.newPage();
   await page.goto(target);
 
