@@ -9,7 +9,7 @@ import fs from 'fs';
 import { createConnection } from 'typeorm';
 import { Order, Store } from './entities';
 
-const target = 'https://trade.aliexpress.com/orderList.htm';
+var target = 'https://trade.aliexpress.com/orderList.htm';
 
 const main = async () => {
   const browser = await puppeteer.launch({ userDataDir: resolve('user_data'), headless: true, defaultViewport: null });
@@ -17,10 +17,9 @@ const main = async () => {
   const offline = process.argv.length >= 3 && process.argv[2] == 'offline';
   const offline_file = resolve('aliexpress.html');
   if (offline && fs.existsSync(offline_file)) {
-    // await page.setContent(fs.readFileSync(offline_file).toString()); // using this all href are somehow empty...
-    await page.goto('file://' + offline_file);
-    console.log('offline: read page content from', offline_file);
-  } else {
+    target = 'file://' + offline_file; // page.goto works, with page.setContent(fs.readFileSync(offline_file).toString()) all href were empty
+    console.log('offline: load page content from', offline_file);
+  }
   await page.goto(target);
 
   // login page
@@ -46,7 +45,6 @@ const main = async () => {
   if (offline && !fs.existsSync(offline_file)){
     fs.writeFileSync(offline_file, await page.content());
     console.log('offline: wrote page content to', offline_file);
-  }
   }
   await inject(page);
   const orders = await page.$$eval('tbody', es => es.map(e => {
