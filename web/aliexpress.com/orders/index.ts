@@ -4,7 +4,7 @@ import auth from '../../../util/auth'
 import puppeteer from 'puppeteer';
 import { inject } from '../../../util/puppeteer';
 import { resolve } from 'path';
-// import fs from 'fs';
+import fs from 'fs';
 
 import { createConnection } from 'typeorm';
 import { Order, Store } from './entities';
@@ -14,8 +14,14 @@ const target = 'https://trade.aliexpress.com/orderList.htm';
 const main = async () => {
   const browser = await puppeteer.launch({ userDataDir: resolve('user_data'), headless: true, defaultViewport: null });
   const page = await browser.newPage();
+  const offline = process.argv.length >= 3 && process.argv[2] == 'offline';
+  const offline_file = resolve('aliexpress.html');
+  if (offline && fs.existsSync(offline_file)) {
+    // await page.setContent(fs.readFileSync(offline_file).toString()); // using this all href are somehow empty...
+    await page.goto('file://' + offline_file);
+    console.log('offline: read page content from', offline_file);
+  } else {
   await page.goto(target);
-  // fs.writeFileSync('aliexpress.html', await page.content());
 
   // login page
   if (page.url().startsWith('https://login.aliexpress.com')) {
@@ -37,6 +43,11 @@ const main = async () => {
     await page.goto(target);
   }
   assert(page.url().startsWith(target));
+  if (offline && !fs.existsSync(offline_file)){
+    fs.writeFileSync(offline_file, await page.content());
+    console.log('offline: wrote page content to', offline_file);
+  }
+  }
   await inject(page);
   const orders = await page.$$eval('tbody', es => es.map(e => {
     const { all, allT, oneT } = window.inj;
