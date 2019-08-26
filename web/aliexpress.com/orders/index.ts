@@ -6,6 +6,9 @@ import { inject } from '../../../util/puppeteer';
 import { resolve } from 'path';
 // import fs from 'fs';
 
+import {createConnection} from 'typeorm';
+import {Order} from './entities';
+
 const target = 'https://trade.aliexpress.com/orderList.htm';
 
 const main = async () => {
@@ -65,6 +68,18 @@ const main = async () => {
     }
   }));
   console.dir(orders, { depth: null });
+
+  // sync with database
+  const db = await createConnection({
+    type: 'sqlite', database: 'aliexpress.sqlite', // required for sqlite
+    entities: [Order], synchronize: true, // boilerplate: register entities, synchronize creates tables if not there
+    logging: true,
+  });
+  const dbm = db.manager;
+  console.log('Saved orders before: ', await dbm.find(Order));
+  await dbm.save(dbm.create('Order', orders)); // need to create instances of Entity from the plain JS objects first; sadly this always inserts instead of update if id exists (and therefore fails on the second run b/c id not unique)
+  // await dbm.update('Order', 'id', orders); // fails with 'No entity column "0" was found.'
+  console.log('Saved orders after: ', await dbm.find(Order));
   // await page.waitFor(5000);
   browser.close();
 };
