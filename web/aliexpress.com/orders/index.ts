@@ -6,8 +6,8 @@ import { inject } from '../../../util/puppeteer';
 import { resolve } from 'path';
 // import fs from 'fs';
 
-import {createConnection} from 'typeorm';
-import {Order} from './entities';
+import { createConnection } from 'typeorm';
+import { Order } from './entities';
 
 const target = 'https://trade.aliexpress.com/orderList.htm';
 
@@ -22,7 +22,7 @@ const main = async () => {
     const cred = await auth(target);
     // const frame = (await (await page.$('iframe'))!.contentFrame())!;
     const frame = page.frames()[2];
-    await frame.$eval('#fm-login-id', (e, a) => (<HTMLInputElement> e).value = a, cred.account);
+    await frame.$eval('#fm-login-id', (e, a) => (<HTMLInputElement>e).value = a, cred.account);
     await frame.type('#fm-login-password', cred.password);
     await Promise.all([frame.click('[type=submit]'), page.waitForNavigation()]);
     if (page.url().startsWith('https://login.aliexpress.com')) {
@@ -39,7 +39,7 @@ const main = async () => {
   assert(page.url().startsWith(target));
   await inject(page);
   const orders = await page.$$eval('tbody', es => es.map(e => {
-    const {all, allT, oneT} = window.inj;
+    const { all, allT, oneT } = window.inj;
     const info = allT(e)('span.info-body');
     const store_url = all(e)('.store-info a', HTMLAnchorElement)[0].href;
     const items = all(e)('tr.order-body').map(e => {

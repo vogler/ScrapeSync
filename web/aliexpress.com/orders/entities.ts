@@ -1,8 +1,8 @@
-import {Entity, Column, PrimaryColumn, JoinColumn} from 'typeorm';
-import { Meta } from '../../../util/db';
+import { Entity, Column, PrimaryColumn, JoinColumn } from 'typeorm';
+import { AutoMeta } from '../../../util/db';
 
 @Entity()
-export class Order extends Meta {
+export class Order extends AutoMeta {
   @PrimaryColumn()
   id: string;
 

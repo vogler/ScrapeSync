@@ -1,12 +1,13 @@
-import {Entity, Column, PrimaryColumn, JoinColumn, CreateDateColumn, UpdateDateColumn, VersionColumn} from 'typeorm';
+import { CreateDateColumn, UpdateDateColumn, VersionColumn } from 'typeorm';
 
-export abstract class Meta {
+// auto-generated meta information on save
+export abstract class AutoMeta {
   @CreateDateColumn()
-  create_date: Date; // auto: insert date
+  create_date: Date; // insert date
 
   @UpdateDateColumn()
-  update_date: Date; // auto: update date
+  update_date: Date; // update date
 
   @VersionColumn()
-  version: number; // auto: increments for each save
+  version: number; // increments for each save
 }

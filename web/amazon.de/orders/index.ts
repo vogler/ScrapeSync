@@ -46,7 +46,7 @@ const main = async () => {
   assert(page.url().startsWith(target));
   await inject(page);
   const orders = await page.$$eval('div.order', es => es.map(e => {
-    const {all, allT, oneT} = window.inj;
+    const { all, allT, oneT } = window.inj;
     const info = allT(e)('span.value');
     const shipments = all(e)('div.shipment').map(e => ({
       status: oneT(e)('span'),
