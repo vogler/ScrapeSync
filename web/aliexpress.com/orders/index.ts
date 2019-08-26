@@ -7,7 +7,7 @@ import { resolve } from 'path';
 // import fs from 'fs';
 
 import { createConnection } from 'typeorm';
-import { Order } from './entities';
+import { Order, Store } from './entities';
 
 const target = 'https://trade.aliexpress.com/orderList.htm';
 
@@ -72,7 +72,7 @@ const main = async () => {
   // sync with database
   const db = await createConnection({
     type: 'sqlite', database: 'aliexpress.sqlite', // required for sqlite
-    entities: [Order], synchronize: true, // boilerplate: register entities, synchronize creates tables if not there
+    entities: [Order, Store], synchronize: true, // boilerplate: register entities, synchronize creates tables if not there
     logging: false,
   });
   const dbm = db.manager;

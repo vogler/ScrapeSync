@@ -1,5 +1,17 @@
-import { Entity, Column, PrimaryColumn, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, JoinColumn, OneToOne } from 'typeorm';
 import { AutoMeta } from '../../../util/db';
+
+@Entity()
+export class Store {
+  @PrimaryColumn()
+  id: string;
+
+  @Column()
+  name: string;
+
+  @Column()
+  url: string;
+}
 
 @Entity()
 export class Order extends AutoMeta {
@@ -9,24 +21,12 @@ export class Order extends AutoMeta {
   @Column()
   order_time: string;
 
-  // @One
-  // @JoinColumn()
-  // store: Store;
+  @OneToOne(() => Store, { cascade: true })
+  @JoinColumn()
+  store: Store;
 
   @Column()
   amount: string;
 
   // items: Item[]
 }
-
-// @Entity()
-// export class Store {
-//   @PrimaryColumn()
-//   id: number;
-
-//   @Column()
-//   name: string;
-
-//   @Column()
-//   url: string;
-// }
