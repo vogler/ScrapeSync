@@ -9,8 +9,9 @@ export class Store {
   @Column()
   name: string;
 
-  @Column()
-  url: string;
+  url() {
+    return `https://www.aliexpress.com/store/${this.id}`;
+  }
 }
 
 @Entity()
@@ -19,7 +20,7 @@ export class Order extends AutoMeta {
   id: string;
 
   @Column()
-  order_time: Date;
+  order_date: Date;
 
   @ManyToOne(() => Store, { cascade: true, eager: true })
   store: Store;

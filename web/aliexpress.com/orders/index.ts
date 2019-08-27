@@ -68,7 +68,7 @@ const main = async () => {
     });
     return {
       id: info[0],
-      order_time: info[1] + ' UTC-7', // Somehow PDT fit to time from 'order has been paid' mails. Why do they use this fixed local time? Can't set timezone on website, same when switching to german. Date is saved as UTC+0 in DB. Need to convert to local time on client.
+      order_date: info[1] + ' UTC-7', // Somehow PDT fit to time from 'order has been paid' mails. Why do they use this fixed local time? Can't set timezone on website, same when switching to german. Date is saved as UTC+0 in DB. Need to convert to local time on client.
       store: {
         id: store_url.split('/').pop(),
         name: info[2],
@@ -82,7 +82,7 @@ const main = async () => {
 
   // sync with database
   const db = await createConnection({
-    type: 'sqlite', database: 'data/' + name + '.sqlite', // required for sqlite
+    type: 'sqlite', database: `data/${name}.sqlite`, // required for sqlite
     entities: [Order, Store], synchronize: true, // boilerplate: register entities, synchronize creates tables if not there
     logging: false,
   });
