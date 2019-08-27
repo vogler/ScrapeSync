@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, JoinColumn, OneToOne } from 'typeorm';
+import { Entity, Column, PrimaryColumn, ManyToOne } from 'typeorm';
 import { AutoMeta } from '../../../util/db';
 
 @Entity()
@@ -21,8 +21,7 @@ export class Order extends AutoMeta {
   @Column()
   order_time: string;
 
-  @OneToOne(() => Store, { cascade: true, eager: true })
-  @JoinColumn()
+  @ManyToOne(() => Store, { cascade: true, eager: true })
   store: Store;
 
   @Column()
