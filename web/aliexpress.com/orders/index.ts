@@ -8,6 +8,7 @@ import fs from 'fs';
 
 import { createConnection } from 'typeorm';
 import { Order, Store } from './entities';
+import { Money } from '../../../util/db';
 
 const name = relative(resolve('web'), __dirname).replace('/', '-');
 var target = 'https://trade.aliexpress.com/orderList.htm';
@@ -49,7 +50,7 @@ const main = async () => {
     console.log('offline: wrote page content to', offline_file);
   }
   await inject(page);
-  const orders = await page.$$eval('tbody', es => es.map(e => {
+  const orders_web = await page.$$eval('tbody', es => es.map(e => {
     const { all, allT, oneT } = window.inj;
     const info = allT(e)('span.info-body');
     const store_url = all(e)('.store-info a', HTMLAnchorElement)[0].href;
@@ -77,8 +78,11 @@ const main = async () => {
       items,
     }
   }));
-  // parse some strings (doing this above in eval would require injecting used functions)
-  // const orders = orders.map(order => {});
+  // parse some strings (doing this above in eval would require injecting used functions) and normalize to common model
+  const orders = orders_web.map(order => {
+    const m = new Money(order.amount_str);
+    return { ...order, price: new Money(order.amount_str) };
+  });
   console.dir(orders, { depth: null });
 
   // sync with database

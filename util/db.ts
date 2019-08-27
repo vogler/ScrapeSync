@@ -13,15 +13,15 @@ export abstract class AutoMeta {
   version: number; // increments for each save
 }
 
-export enum Currency { EUR, USD }
-
+// export enum Currency { EUR, USD }
 export class Money {
   constructor(s: string) {
+    if (!s) return;
     var n = s;
     if (s != (n = s.replace('USD', '').replace('$', ''))) {
-      this.currency = Currency.USD;
+      this.currency = '$';
     } else if (s != (n = s.replace('EUR', '').replace('€', ''))) {
-      this.currency = Currency.EUR;
+      this.currency = '€';
     } else {
       fail('Unknown currency in ' + s);
     }
@@ -29,8 +29,9 @@ export class Money {
   }
 
   @Column()
-  amount: number;
+  amount: number; // currency shouldn't be a float
 
-  @Column({ type: 'enum', enum: Currency, default: Currency.EUR })
-  currency: Currency
+  // @Column({ type: 'enum', enum: Currency, default: Currency.EUR })
+  @Column()
+  currency: string; // sqlite does not support enum
 }
