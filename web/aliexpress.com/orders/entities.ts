@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryColumn, ManyToOne } from 'typeorm';
-import { AutoMeta } from '../../../util/db';
+import { AutoMeta, Money } from '../../../util/db';
 
 @Entity()
 export class Store {
@@ -25,8 +25,8 @@ export class Order extends AutoMeta {
   @ManyToOne(() => Store, { cascade: true, eager: true })
   store: Store;
 
-  @Column()
-  amount: string;
+  @Column(() => Money)
+  amount: Money;
 
   // items: Item[]
 }
