@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryColumn, ManyToOne } from 'typeorm';
-import { AutoMeta, Money } from '../../../util/db';
+import { AutoMeta } from '../../../util/db';
 
 @Entity()
 export class Store {
@@ -25,8 +25,11 @@ export class Order extends AutoMeta {
   @ManyToOne(() => Store, { cascade: true, eager: true })
   store: Store;
 
-  @Column(() => Money)
-  amount: Money;
+  @Column()
+  amount: string; // currency shouldn't be a float
+
+  // @Column()
+  // currency: string; // sqlite does not support enum
 
   // items: Item[]
 }

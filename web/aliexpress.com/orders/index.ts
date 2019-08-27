@@ -8,7 +8,6 @@ import fs from 'fs';
 
 import { createConnection } from 'typeorm';
 import { Order, Store } from './entities';
-import { Money } from '../../../util/db';
 
 const name = relative(resolve('web'), __dirname).replace('/', '-');
 var target = 'https://trade.aliexpress.com/orderList.htm';
@@ -50,13 +49,6 @@ const main = async () => {
     console.log('offline: wrote page content to', offline_file);
   }
   await inject(page);
-  // sync with database
-  const db = await createConnection({
-    type: 'sqlite', database: `data/${name}.sqlite`, // required for sqlite
-    entities: [Order, Store], synchronize: true, // boilerplate: register entities, synchronize creates tables if not there
-    logging: false,
-  });
-  const dbm = db.manager;
   const orders = await page.$$eval('tbody', es => es.map(e => {
     const { all, allT, oneT } = window.inj;
     const info = allT(e)('span.info-body');
@@ -82,12 +74,19 @@ const main = async () => {
         name: info[2],
         url: store_url,
       },
-      amount: new Money(allT(e)('p.amount-num')[0]),
+      amount: allT(e)('p.amount-num')[0],
       items,
     }
   }));
   console.dir(orders, { depth: null });
 
+  // sync with database
+  const db = await createConnection({
+    type: 'sqlite', database: `data/${name}.sqlite`, // required for sqlite
+    entities: [Order, Store], synchronize: true, // boilerplate: register entities, synchronize creates tables if not there
+    logging: false,
+  });
+  const dbm = db.manager;
   console.log('Saved orders before: ', await dbm.find(Order));
   await dbm.save(Order, orders);
   console.log('Saved orders after: ', await dbm.find(Order));
