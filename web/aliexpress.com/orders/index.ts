@@ -72,12 +72,14 @@ const main = async () => {
       store: {
         id: store_url.split('/').pop(),
         name: info[2],
-        url: store_url,
+        // url: store_url, // unused, use Store.url method
       },
-      amount: allT(e)('p.amount-num')[0],
+      amount_str: allT(e)('p.amount-num')[0],
       items,
     }
   }));
+  // parse some strings (doing this above in eval would require injecting used functions)
+  // const orders = orders.map(order => {});
   console.dir(orders, { depth: null });
 
   // sync with database
