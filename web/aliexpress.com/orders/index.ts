@@ -72,7 +72,6 @@ const main = async () => {
       store: {
         id: store_url.split('/').pop(),
         name: info[2],
-        // url: store_url, // unused, use Store.url method
       },
       amount_str: allT(e)('p.amount-num')[0],
       items,

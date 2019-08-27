@@ -25,21 +25,18 @@ export class Order extends AutoMeta {
   @ManyToOne(() => Store, { cascade: true, eager: true })
   store: Store;
 
-  set amount_str(s: string) {
-    console.log('amount_str', s);
-    this.amount = 123;
-    this.currency = 'USD';
-  }
+  // private _amount: string;
   @Column()
-  get amount_str(): string {
-    return this.amount_str;
+  public set amount_str(s: string) {
+    console.log('setter', s);
+    // this._amount = s;
   }
 
-  @Column()
-  amount: number;
+  // @Column()
+  // amount: number; // currency shouldn't be a float
 
-  @Column()
-  currency: string; // sqlite does not support enum
+  // @Column()
+  // currency: string; // sqlite does not support enum
 
 
   // items: Item[]
