@@ -19,7 +19,7 @@ export class Order extends AutoMeta {
   id: string;
 
   @Column()
-  order_time: string;
+  order_time: Date;
 
   @ManyToOne(() => Store, { cascade: true, eager: true })
   store: Store;
