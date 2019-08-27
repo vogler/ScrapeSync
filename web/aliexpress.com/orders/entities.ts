@@ -21,7 +21,7 @@ export class Order extends AutoMeta {
   @Column()
   order_time: string;
 
-  @OneToOne(() => Store, { cascade: true })
+  @OneToOne(() => Store, { cascade: true, eager: true })
   @JoinColumn()
   store: Store;
 
