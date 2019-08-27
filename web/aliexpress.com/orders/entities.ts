@@ -30,10 +30,11 @@ export class Order extends AutoMeta {
   public set amount_str(s: string) {
     console.log('setter', s);
     // this._amount = s;
+    this.amount = 12.34;
   }
 
-  // @Column()
-  // amount: number; // currency shouldn't be a float
+  @Column()
+  amount: number; // currency shouldn't be a float
 
   // @Column()
   // currency: string; // sqlite does not support enum
