@@ -20,7 +20,8 @@ const login = async (page: puppeteer.Page) => {
   const frame = page.frames()[2];
   await frame.$eval('#fm-login-id', (e, a) => (<HTMLInputElement>e).value = a, cred.account);
   await frame.type('#fm-login-password', cred.password);
-  await Promise.all([frame.click('[type=submit]'), page.waitForNavigation()]);
+  await frame.click('[type=submit]');
+  await page.waitForNavigation();
   if (page.url().startsWith('https://login.aliexpress.com')) {
     console.error('Login failed. Wrong credentials?');
     if (await cred.delete()) console.log('Deleted saved credentials.');
@@ -30,7 +31,7 @@ const login = async (page: puppeteer.Page) => {
 };
 
 const extract = async (page: puppeteer.Page) => {
-  await inject(page); // utility functions in window.inj needed for extract
+  await inject(page); // utility functions in window.inj used for extract
   // 1. extract as is
   const orders_web = await page.$$eval('tbody', es => es.map(e => {
     const { all, allT, oneT } = window.inj;
@@ -117,7 +118,7 @@ const main = async () => {
   const dbm = db.manager;
   // console.log('Saved orders before:', await dbm.find(Order));
   const count = () => Promise.all(entities.map(entity => dbm.count(entity)));
-  const log_count = async (counts: number[], where: string) => console.log(`New entities (${where}):`, (await count()).map((c, i) => [entities[i].name, c - counts[i]]));
+  const log_count = async (old_counts: number[], where: string) => console.log(`New entities (${where}):`, (await count()).map((c, i) => [entities[i].name, c - old_counts[i]]));
   const counts_init = await count();
   var counts = counts_init;
   var page_num = 1;
@@ -127,6 +128,7 @@ const main = async () => {
     const orders = await extract(page);
     await dbm.save(Order, orders);
     await log_count(counts, `page ${page_num}`);
+    // Done if no change in counts. This relies on new entries appearing first. This will check the next page even if there are already old entries on the current page (could be optimized, but good enough and more robust in case a new item comes after an old one (should not be the case)).
     if ((await count()).toString() == counts.toString()) { // JS has no structural equality, didn't want to add deep-equal, string is fine here
       console.log('Did not insert any new entities. Done.'); // TODO what about updates to exisiting entities?
       break;
