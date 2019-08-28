@@ -49,13 +49,19 @@ export class Order extends AutoMeta {
 // Order Item could extend Product (advantage: list all orders for a product), but better to have a snapshot with all data in case e.g. product names change
 @Entity()
 export class Item {
-  @PrimaryGeneratedColumn('uuid') // composite primary keys are supported, but PrimaryColumn on both order and productId broke the ManyToOne and led to 'Data type "Order" in "Item.order" is not supported by "sqlite" database'. TODO this always generates a new ID!
-  id: string;
-
   @ManyToOne(() => Order, order => order.items)
   order: Order;
 
-  @Column()
+  // Use orderId+productId as a composite primary key. PrimaryColumn decoration on ManyToOne directly does not work; need to list the resulting orderId explicitly.
+  // @PrimaryColumn()
+  // orderId: string;
+  // This fails on non-empty DB with
+  // 1) orderId being NULL
+  // 2) orderId and productId being not UNIQUE if I set orderId explicitly
+  // see https://github.com/typeorm/typeorm/issues/3238
+  // TODO now, with just productId as PK, different order items for the same productId won't be saved
+
+  @PrimaryColumn()
   productId: string;
 
   @Column()

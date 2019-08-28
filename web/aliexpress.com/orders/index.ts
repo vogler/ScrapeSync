@@ -88,6 +88,7 @@ const main = async () => {
     const items = order.items.map(item => {
       return {
         ...item,
+        // orderId: order.id,
         price: new Money(item.price),
       };
     });
