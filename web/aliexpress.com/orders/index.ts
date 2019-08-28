@@ -7,7 +7,7 @@ import { resolve, relative } from 'path';
 import fs from 'fs';
 
 import { createConnection } from 'typeorm';
-import { Order, Store } from './entities';
+import { Order, Store, Item } from './entities';
 import { Money } from '../../../util/db';
 
 const name = relative(resolve('web'), __dirname).replace('/', '-');
@@ -45,11 +45,12 @@ const main = async () => {
     await page.goto(target);
   }
   assert(page.url().startsWith(target));
-  if (offline && !fs.existsSync(offline_file)){
+  if (offline && !fs.existsSync(offline_file)) {
     fs.writeFileSync(offline_file, await page.content());
     console.log('offline: wrote page content to', offline_file);
   }
-  await inject(page);
+  await inject(page); // utility functions in window.inj
+  // 1. extract
   const orders_web = await page.$$eval('tbody', es => es.map(e => {
     const { all, allT, oneT } = window.inj;
     const info = allT(e)('span.info-body');
@@ -58,13 +59,14 @@ const main = async () => {
       const a = all(e)('a.baobei-name', HTMLAnchorElement)[0];
       const [price, quantity] = allT(e)('.product-amount span');
       return {
+        productId: a.href.match(/\/(\d+)\.html.*$/)![1],
         name: a.innerText,
         variant: oneT(e)('.product-property span.val'),
         price,
         quantity: parseInt(quantity.replace('X', '')),
         status: oneT(e)('.order-status span'),
-        url: a.href,
-        img: all(e)('img', HTMLImageElement)[0].src,
+        url: a.href.replace('file://', 'https://'),
+        img_url: all(e)('img', HTMLImageElement)[0].src,
       }
     });
     return {
@@ -74,28 +76,42 @@ const main = async () => {
         id: store_url.split('/').pop(),
         name: info[2],
       },
-      amount_str: allT(e)('p.amount-num')[0],
+      amount: allT(e)('p.amount-num')[0],
       items,
     }
   }));
+  // console.dir(orders_web, { depth: null });
+  // 2. transform
   // parse some strings (doing this above in eval would require injecting used functions) and normalize to common model
   const orders = orders_web.map(order => {
-    const m = new Money(order.amount_str);
-    return { ...order, price: new Money(order.amount_str) };
+    const items = order.items.map(item => {
+      return {
+        ...item,
+        price: new Money(item.price),
+      };
+    });
+    return {
+      ...order,
+      items,
+      price: new Money(order.amount),
+    };
   });
   console.dir(orders, { depth: null });
-
-  // sync with database
+  // 3. sync with database
+  const entities = [Order, Store, Item];
   const db = await createConnection({
     type: 'sqlite', database: `data/${name}.sqlite`, // required for sqlite
-    entities: [Order, Store], synchronize: true, // boilerplate: register entities, synchronize creates tables if not there
+    entities, synchronize: true, // boilerplate: register entities, synchronize creates tables if not there
     logging: false,
   });
   const dbm = db.manager;
-  console.log('Saved orders before: ', await dbm.find(Order));
+  const count = () => Promise.all(entities.map(entity => dbm.count(entity)));
+  const counts = await count();
+  // console.log('Saved orders before:', await dbm.find(Order));
   await dbm.save(Order, orders);
-  console.log('Saved orders after: ', await dbm.find(Order));
-  // await page.waitFor(5000);
+  console.dir(await dbm.find(Order), { depth: null });
+  console.log('New entities:', (await count()).map((c, i) => c - counts[i]));
+  // done
   browser.close();
 };
 main();
