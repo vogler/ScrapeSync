@@ -127,7 +127,7 @@ const main = async () => {
     const orders = await extract(page);
     await dbm.save(Order, orders);
     await log_count(counts, `page ${page_num}`);
-    if (await count() == counts) {
+    if ((await count()).toString() == counts.toString()) { // JS has no structural equality, didn't want to add deep-equal, string is fine here
       console.log('Did not insert any new entities. Done.'); // TODO what about updates to exisiting entities?
       break;
     }
