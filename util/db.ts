@@ -25,7 +25,7 @@ export class Money {
     } else {
       fail('Unknown currency in ' + s);
     }
-    this.amount = parseFloat(n.trim()); // TODO should use some int/decimal to store it
+    this.amount = parseFloat(n.trim().replace(',', '.')); // TODO should use some int/decimal to store it
   }
 
   @Column()
