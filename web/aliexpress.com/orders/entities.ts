@@ -59,9 +59,13 @@ export class Item {
   // 1) orderId being NULL
   // 2) orderId and productId being not UNIQUE if I set orderId explicitly
   // see https://github.com/typeorm/typeorm/issues/3238
-  // TODO now, with just productId as PK, different order items for the same productId won't be saved
 
+  // Workaround: manual id = orderId+productId. TODO remove this hack once typeorm fixes composite primary keys.
   @PrimaryColumn()
+  id: string;
+
+  // With just productId as PK, different order items for the same productId would overwrite each other.
+  @Column()
   productId: string;
 
   @Column()

@@ -89,6 +89,7 @@ const main = async () => {
       return {
         ...item,
         // orderId: order.id,
+        id: order.id + item.productId, // TODO remove this hack once typeorm fixes composite primary keys.
         price: new Money(item.price),
       };
     });
