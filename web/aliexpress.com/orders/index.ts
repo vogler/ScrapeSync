@@ -10,6 +10,7 @@ import { createConnection } from 'typeorm';
 import { Order, Store, Item } from './entities';
 import { Money } from '../../../util/db';
 
+const debug = true;
 const name = relative(resolve('web'), __dirname).replace('/', '-');
 var target = 'https://trade.aliexpress.com/orderList.htm';
 
@@ -80,7 +81,7 @@ const main = async () => {
       items,
     }
   }));
-  // console.dir(orders_web, { depth: null });
+  // if (debug) console.dir(orders_web, { depth: null });
   // 2. transform
   // parse some strings (doing this above in eval would require injecting used functions) and normalize to common model
   const orders = orders_web.map(order => {
@@ -96,7 +97,7 @@ const main = async () => {
       price: new Money(order.amount),
     };
   });
-  console.dir(orders, { depth: null });
+  if (debug) console.dir(orders, { depth: null });
   // 3. sync with database
   const entities = [Order, Store, Item];
   const db = await createConnection({
@@ -109,7 +110,7 @@ const main = async () => {
   const counts = await count();
   // console.log('Saved orders before:', await dbm.find(Order));
   await dbm.save(Order, orders);
-  console.dir(await dbm.find(Order), { depth: null });
+  if (debug) console.dir(await dbm.find(Order), { depth: null });
   console.log('New entities:', (await count()).map((c, i) => [entities[i].name, c - counts[i]]));
   // done
   browser.close();
