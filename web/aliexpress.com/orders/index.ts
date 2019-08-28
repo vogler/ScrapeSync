@@ -14,44 +14,24 @@ const debug = true;
 const name = relative(resolve('web'), __dirname).replace('/', '-');
 var target = 'https://trade.aliexpress.com/orderList.htm';
 
-const main = async () => {
-  const browser = await puppeteer.launch({ userDataDir: resolve('data/browser'), headless: true, defaultViewport: null });
-  const page = await browser.newPage();
-  const offline = process.argv.length >= 3 && process.argv[2] == 'offline';
-  const offline_file = resolve('data/', name + '.html');
-  console.log(__dirname, offline_file);
-  if (offline && fs.existsSync(offline_file)) {
-    target = 'file://' + offline_file; // page.goto works, with page.setContent(fs.readFileSync(offline_file).toString()) all href were empty
-    console.log('offline: load page content from', offline_file);
-  }
-  await page.goto(target);
-
-  // login page
+const login = async (page: puppeteer.Page) => {
+  const cred = await auth(target);
+  // const frame = (await (await page.$('iframe'))!.contentFrame())!;
+  const frame = page.frames()[2];
+  await frame.$eval('#fm-login-id', (e, a) => (<HTMLInputElement>e).value = a, cred.account);
+  await frame.type('#fm-login-password', cred.password);
+  await Promise.all([frame.click('[type=submit]'), page.waitForNavigation()]);
   if (page.url().startsWith('https://login.aliexpress.com')) {
-    const cred = await auth(target);
-    // const frame = (await (await page.$('iframe'))!.contentFrame())!;
-    const frame = page.frames()[2];
-    await frame.$eval('#fm-login-id', (e, a) => (<HTMLInputElement>e).value = a, cred.account);
-    await frame.type('#fm-login-password', cred.password);
-    await Promise.all([frame.click('[type=submit]'), page.waitForNavigation()]);
-    if (page.url().startsWith('https://login.aliexpress.com')) {
-      console.error('Login failed. Wrong credentials?');
-      if (await cred.delete()) console.log('Deleted saved credentials.');
-      process.exit(1);
-    }
-    await cred.save();
+    console.error('Login failed. Wrong credentials?');
+    if (await cred.delete()) console.log('Deleted saved credentials.');
+    process.exit(1);
   }
-  if (!page.url().startsWith(target)) {
-    console.warn(`URL is ${page.url()} instead of ${target}! Redirecting...`);
-    await page.goto(target);
-  }
-  assert(page.url().startsWith(target));
-  if (offline && !fs.existsSync(offline_file)) {
-    fs.writeFileSync(offline_file, await page.content());
-    console.log('offline: wrote page content to', offline_file);
-  }
-  await inject(page); // utility functions in window.inj
-  // 1. extract
+  await cred.save();
+};
+
+const extract = async (page: puppeteer.Page) => {
+  await inject(page); // utility functions in window.inj needed for extract
+  // 1. extract as is
   const orders_web = await page.$$eval('tbody', es => es.map(e => {
     const { all, allT, oneT } = window.inj;
     const info = allT(e)('span.info-body');
@@ -82,8 +62,7 @@ const main = async () => {
     }
   }));
   // if (debug) console.dir(orders_web, { depth: null });
-  // 2. transform
-  // parse some strings (doing this above in eval would require injecting used functions) and normalize to common model
+  // 2. transform: parse some strings (doing this above in eval would require injecting used functions) and normalize to common model
   const orders = orders_web.map(order => {
     const items = order.items.map(item => {
       return {
@@ -100,7 +79,35 @@ const main = async () => {
     };
   });
   if (debug) console.dir(orders, { depth: null });
-  // 3. sync with database
+  return orders;
+};
+
+const main = async () => {
+  const browser = await puppeteer.launch({ userDataDir: resolve('data/browser'), headless: false, defaultViewport: null });
+  const page = await browser.newPage();
+  const offline = process.argv.length >= 3 && process.argv[2] == 'offline';
+  const offline_file = resolve('data/', name + '.html');
+  console.log(__dirname, offline_file);
+  if (offline && fs.existsSync(offline_file)) {
+    target = 'file://' + offline_file; // page.goto works, with page.setContent(fs.readFileSync(offline_file).toString()) all href were empty
+    console.log('offline: load page content from', offline_file);
+  }
+  await page.goto(target);
+
+  // login page
+  if (page.url().startsWith('https://login.aliexpress.com')) {
+    await login(page);
+  }
+  if (!page.url().startsWith(target)) {
+    console.warn(`URL is ${page.url()} instead of ${target}! Redirecting...`);
+    await page.goto(target);
+  }
+  assert(page.url().startsWith(target));
+  if (offline && !fs.existsSync(offline_file)) {
+    fs.writeFileSync(offline_file, await page.content());
+    console.log('offline: wrote page content to', offline_file);
+  }
+  // connect to database
   const entities = [Order, Store, Item];
   const db = await createConnection({
     type: 'sqlite', database: `data/${name}.sqlite`, // required for sqlite
@@ -108,12 +115,34 @@ const main = async () => {
     logging: false,
   });
   const dbm = db.manager;
-  const count = () => Promise.all(entities.map(entity => dbm.count(entity)));
-  const counts = await count();
   // console.log('Saved orders before:', await dbm.find(Order));
-  await dbm.save(Order, orders);
+  const count = () => Promise.all(entities.map(entity => dbm.count(entity)));
+  const log_count = async (counts: number[], where: string) => console.log(`New entities (${where}):`, (await count()).map((c, i) => [entities[i].name, c - counts[i]]));
+  const counts_init = await count();
+  var counts = counts_init;
+  var page_num = 1;
+  do {
+    counts = await count();
+    console.log('extract page', page_num);
+    const orders = await extract(page);
+    await dbm.save(Order, orders);
+    await log_count(counts, `page ${page_num}`);
+    if (await count() == counts) {
+      console.log('Did not insert any new entities. Done.'); // TODO what about updates to exisiting entities?
+      break;
+    }
+    const next = await page.$('a.ui-pagination-next');
+    if (next == null) {
+      console.log('Reached last page. Done.');
+      break;
+    } else {
+      await next.click();
+      await page.waitForNavigation();
+    }
+    page_num++;
+  } while (true);
   if (debug) console.dir(await dbm.find(Order), { depth: null });
-  console.log('New entities:', (await count()).map((c, i) => [entities[i].name, c - counts[i]]));
+  await log_count(counts_init, 'total');
   // done
   browser.close();
 };
