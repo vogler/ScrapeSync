@@ -45,7 +45,6 @@ const extract = async (page: puppeteer.Page) => {
         variant: oneT(e)('.product-property span.val'),
         price,
         quantity: parseInt(quantity.replace('X', '')),
-        status: oneT(e)('.order-status span'),
         url: a.href.replace('file://', 'https://'),
         img_url: all(e)('img', HTMLImageElement)[0].src,
       }
@@ -59,6 +58,7 @@ const extract = async (page: puppeteer.Page) => {
       },
       amount: allT(e)('p.amount-num')[0],
       items,
+      status: oneT(e)('.order-status span'),
     }
   }));
   // if (debug) console.dir(orders_web, { depth: null });

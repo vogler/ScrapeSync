@@ -30,6 +30,9 @@ export class Order extends AutoMeta {
 
   @OneToMany(() => Item, item => item.order, { cascade: true, eager: true })
   items: Item[]
+
+  @Column()
+  status: string;
 }
 
 // @Entity()
@@ -79,9 +82,6 @@ export class Item {
 
   @Column()
   quantity: number;
-
-  @Column()
-  status: string;
 
   @Column()
   url: string; // could be generated from id (see url_gen), but original also includes item name (not really needed but hey)
