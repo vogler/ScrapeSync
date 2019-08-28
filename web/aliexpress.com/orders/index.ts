@@ -110,7 +110,7 @@ const main = async () => {
   // console.log('Saved orders before:', await dbm.find(Order));
   await dbm.save(Order, orders);
   console.dir(await dbm.find(Order), { depth: null });
-  console.log('New entities:', (await count()).map((c, i) => c - counts[i]));
+  console.log('New entities:', (await count()).map((c, i) => [entities[i].name, c - counts[i]]));
   // done
   browser.close();
 };
