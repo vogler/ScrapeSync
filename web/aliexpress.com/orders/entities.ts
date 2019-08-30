@@ -75,7 +75,7 @@ export class Item {
   name: string;
 
   @Column({ nullable: true })
-  variant: string;
+  variant: string; // better string[], but not supported by sqlite
 
   @Column(() => Money)
   price: Money;

@@ -43,7 +43,7 @@ const extract = async (page: puppeteer.Page) => {
       return {
         productId: a.href.match(/\/(\d+)\.html.*$/)![1],
         name: a.innerText,
-        variant: oneT(e)('.product-property span.val'),
+        variant: allT(e)('.product-property span.val').join(), // results in 'v1,v2,v3'; sqlite does not support string[]
         price,
         quantity: parseInt(quantity.replace('X', '')),
         url: a.href.replace('file://', 'https://'),
