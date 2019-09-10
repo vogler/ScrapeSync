@@ -53,7 +53,8 @@ Seems to make sense to stick to node/javascript.
   - Fast but only works if data is included in the initial server response. Login might be hard.
 - [Puppeteer](https://github.com/GoogleChrome/puppeteer): Headless Chrome Node API
   - [Nightmare](https://github.com/segmentio/nightmare): same but using Electron?
-  - [Daydream](https://github.com/segmentio/daydream): chrome extension to record your actions into a nightmare or puppeteer script
+    - [Daydream](https://github.com/segmentio/daydream): chrome extension to record your actions into a nightmare or puppeteer script
+  - [Puppeteer Recorder](https://github.com/checkly/puppeteer-recorder)
 - ruled out: [PhantomJS](https://github.com/ariya/phantomjs) (archived), [jsdom](https://github.com/jsdom/jsdom) (limitations)
 
 ### Sync
