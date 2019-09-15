@@ -61,9 +61,10 @@ export class Item {
   // This fails on non-empty DB with
   // 1) orderId being NULL
   // 2) orderId and productId being not UNIQUE if I set orderId explicitly
-  // see https://github.com/typeorm/typeorm/issues/3238
+  // https://github.com/typeorm/typeorm/issues/3238
 
   // Workaround: manual id = orderId+productId. TODO remove this hack once typeorm fixes composite primary keys.
+  // https://github.com/typeorm/typeorm/issues/4122
   @PrimaryColumn()
   id: string;
 
