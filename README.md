@@ -59,6 +59,7 @@ How to detect change?
   - Most web sites we will have to query periodically. What's a good delay? How to schedule? Limit traffic? Spread out to avoid congestion?
     - APIs might have a limit on the number of requests.
     - Web sites might block us if we request a page too often?
+    - Web services to track/notify on website changes: https://www.wachete.com, https://visualping.io, https://www.sken.io, https://changetower.com
 
 ### Web scraping
 
